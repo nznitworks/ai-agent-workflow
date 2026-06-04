@@ -79,43 +79,61 @@ def extract_and_write_files(output: str, project_path: str) -> list[str]:
     """
     Parse the agent output and write any code blocks to disk.
 
-    Looks for patterns like:
-        ### path/to/file.ext
-        ```lang
-        ...code...
-        ```
-    or:
-        File: path/to/file.ext
-        ```lang
-        ...code...
-        ```
+    Catches multiple formats:
+        ### path/to/file.ext          (preferred)
+        **path/to/file.ext**          (bold markdown)
+        File: path/to/file.ext        (explicit label)
+        # path/to/file.ext            (heading)
+        `path/to/file.ext`            (inline code)
     """
     written = []
 
-    # Match file path followed by a code block
+    # Broad pattern — catches most LLM output styles
     pattern = re.compile(
-        r'(?:###?\s*|File:\s*|`{0,1})'         # prefix
-        r'([\w./\-]+\.\w+)'                      # file path
-        r'[`\s]*\n'                              # optional trailing chars
-        r'```[\w]*\n'                            # opening code fence
-        r'(.*?)'                                 # code content
-        r'```',                                  # closing fence
+        r'(?:'
+        r'#{1,3}\s+'           # ### or ## or #
+        r'|File:\s*'           # File:
+        r'|\*{1,2}'            # ** bold
+        r'|`'                  # backtick
+        r')?'
+        r'((?:[\w\-]+/)*[\w\-]+\.(?:ts|tsx|js|jsx|json|yaml|yml|md|py|css|html|env|sh|toml|lock))'
+        r'(?:\*{1,2}|`)?'     # closing bold/backtick
+        r'\s*\n+'              # newlines
+        r'```(?:\w+)?\n'       # opening fence
+        r'(.*?)'               # file contents
+        r'```',                # closing fence
         re.DOTALL
     )
 
     matches = pattern.findall(output)
 
     if not matches:
-        # Save raw output as a reference file so nothing is lost
+        # Try looser pattern — just find any code blocks with a path nearby
+        loose_pattern = re.compile(
+            r'([\w./\-]+\.(?:ts|tsx|js|jsx|json|yaml|yml|md|py|css|html|sh|toml))'
+            r'[^\n]*\n'
+            r'```(?:\w+)?\n'
+            r'(.*?)'
+            r'```',
+            re.DOTALL
+        )
+        matches = loose_pattern.findall(output)
+
+    if not matches:
+        # Save raw output so nothing is lost
         raw_path = os.path.join(project_path, "ai-dev-team-output.md")
         with open(raw_path, "w") as f:
             f.write(f"# AI Dev Team Output\n\n{output}")
-        print(f"\n⚠️  No file patterns found in output.")
+        print(f"\n⚠️  Could not parse files from output.")
         print(f"   Raw output saved to: {raw_path}")
-        print(f"   Review it and create files manually.")
+        print(f"   Check the file — code may be there but in unexpected format.")
         return []
 
     for file_path, content in matches:
+        # Skip if path looks wrong
+        if len(file_path) > 200 or " " in file_path:
+            continue
+
         # Resolve relative paths against project root
         if not file_path.startswith("/"):
             full_path = os.path.join(project_path, file_path)
@@ -183,6 +201,13 @@ def run_feature(feature_request: str, project_path: str):
 
     # Extract output string from CrewAI result
     output = str(result.raw) if hasattr(result, "raw") else str(result)
+
+    # DEBUG — print raw output to see what the executor returned
+    print(f"\n{'─' * 50}")
+    print("🔍 DEBUG — Raw executor output:")
+    print(f"{'─' * 50}")
+    print(output[:3000])  # first 3000 chars
+    print(f"{'─' * 50}\n")
 
     print(f"\n{'─' * 50}")
     print("📝 Extracting and writing files...")
