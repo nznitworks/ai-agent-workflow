@@ -132,12 +132,40 @@ def create_tasks(feature_request: str, project_path: str) -> list[Task]:
             {"- Test rendering, user interactions, and API calls (mock fetch/axios)" if template_name == "react-app-generator" else "- Cover happy path, edge cases, and 422 validation errors"}
             {"- No real API calls in tests — mock all external services" if template_name == "react-app-generator" else "- No live internet calls — mock external dependencies"}
 
-            Write all files directly to the project directory.
+            CRITICAL OUTPUT FORMAT — you MUST follow this exactly:
+            For every file you create or modify, output it like this:
+
+            ### relative/path/to/file.ext
+            ```language
+            ...full file contents here...
+            ```
+
+            Example:
+            ### frontend/src/types/api.ts
+            ```typescript
+            export interface HttpCheckRequest {{
+              url: string
+            }}
+            ```
+
+            ### frontend/package.json
+            ```json
+            {{
+              "name": "frontend"
+            }}
+            ```
+
+            Output ALL files this way. Do not summarize or skip any file.
+            Do not say "I would create..." — actually output the full contents.
         """,
         agent=executor,
         expected_output=(
-            f"All files from the implementation plan written to disk with "
-            f"{'clean TypeScript React components, hooks, services, and Vitest/Jest tests.' if template_name == 'react-app-generator' else 'clean async code, Pydantic v2 models, and pytest test cases.'}"
+            f"Every file listed in the plan, each formatted as:\n"
+            f"### path/to/file.ext\n"
+            f"```language\n"
+            f"...full file contents...\n"
+            f"```\n"
+            f"All files complete with no placeholders or summaries."
         ),
         context=[planning_task],
     )
