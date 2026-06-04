@@ -152,6 +152,45 @@ def extract_and_write_files(output: str, project_path: str) -> list[str]:
     return written
 
 
+def extract_plan_section(full_plan: str, section_num: int, label: str) -> str:
+    """
+    Extract a numbered section from Claude's structured plan.
+
+    Looks for headers like "## Section 2 — Hooks" or "Section 2:" or just
+    the label text. Returns everything between this section header and the
+    next section header (or end of plan).
+
+    Falls back to returning the full plan if sections can't be parsed.
+
+    Args:
+        full_plan: The complete plan text from Claude
+        section_num: 1-based section number
+        label: The section label (e.g. "Hooks")
+
+    Returns:
+        The extracted section text, or the full plan as fallback
+    """
+    # Try multiple header patterns Claude might use
+    patterns = [
+        # ## Section 2 — Hooks  or  ## Section 2 - Hooks
+        rf'(?:^|\n)##?\s*Section\s+{section_num}\s*[—\-:]\s*{re.escape(label)}.*?\n(.*?)(?=\n##?\s*Section\s+\d|\Z)',
+        # ## 2. Hooks  or  ## 2) Hooks
+        rf'(?:^|\n)##?\s*{section_num}[.\)]\s*{re.escape(label)}.*?\n(.*?)(?=\n##?\s*\d[.\)]|\Z)',
+        # Just look for the label as a heading
+        rf'(?:^|\n)##?\s*{re.escape(label)}.*?\n(.*?)(?=\n##?\s|\Z)',
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, full_plan, re.DOTALL | re.IGNORECASE)
+        if match:
+            section = match.group(1).strip()
+            if section:
+                return section
+
+    # Fallback — return full plan so the executor still has context
+    return full_plan
+
+
 def print_copilot_review_reminder(written_files: list[str] = None):
     print(f"\n{'─' * 50}")
     print("✅ Implementation complete!")
