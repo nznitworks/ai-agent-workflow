@@ -158,6 +158,223 @@ def detect_chunk_template(feature_request: str) -> dict | None:
     return best_match
 
 
+def create_chunked_planning_task(
+    feature_request: str,
+    project_path: str,
+    chunk_template: dict,
+) -> Task:
+    """
+    Create a planning task that instructs Claude to structure its plan
+    into predefined sections matching the chunk template.
+
+    Args:
+        feature_request: The user's feature description
+        project_path: Absolute path to the project root
+        chunk_template: A CHUNK_TEMPLATES entry with 'chunks' list
+
+    Returns:
+        A single planning Task for Claude
+    """
+    template_name = chunk_template["template_name"]
+    is_react = template_name == "react-app-generator"
+
+    # Build section instructions from chunks
+    section_instructions = []
+    for i, chunk in enumerate(chunk_template["chunks"], 1):
+        files_list = "\n".join(f"      - {f}" for f in chunk["target_files"])
+        section_instructions.append(
+            f"    Section {i} — {chunk['label']}:\n"
+            f"      {chunk['description']}\n"
+            f"      Files:\n{files_list}"
+        )
+    sections_block = "\n\n".join(section_instructions)
+
+    context_step = (
+        "Use the ReactUIContext tool with input 'all' to read the existing "
+        "React project structure, components, pages, hooks, and config."
+        if is_react else
+        "Use the NetworkCheckerContext tool with input 'all' to read the "
+        "existing services, schemas, routes, and config."
+    )
+
+    rules = (
+        "React-specific rules to follow:\n"
+        "1. Use functional components and hooks exclusively — no class components\n"
+        "2. TypeScript-first: define interfaces for all props, state, and API responses\n"
+        "3. Follow naming: PascalCase for components, camelCase for functions/variables\n"
+        "4. Separate concerns: components/, hooks/, services/, utils/, pages/\n"
+        "5. Use environment variables for API base URLs and config\n"
+        "6. Tests with Vitest or Jest — cover rendering, user interactions, and API calls\n"
+        "7. Use ESLint + Prettier for code quality\n"
+        "8. Implement error boundaries for error handling"
+        if is_react else
+        "FastAPI-specific rules to follow (AMIPDH):\n"
+        "1. Route handlers stay thin — all logic goes in services/\n"
+        "2. Service functions must be async def using httpx.AsyncClient\n"
+        "3. All inputs/outputs must use Pydantic v2 models with validators\n"
+        "4. Catch exceptions in services, return ok=False — never raise to route handlers\n"
+        "5. Tests must use TestClient, no live internet calls\n"
+        "6. Python version: 3.11\n"
+        "7. Port stays 8080, base image stays ING RHEL9\n"
+        "8. Flag if README.md or AGENTS.md need updating"
+    )
+
+    return Task(
+        description=f"""
+            You are the tech lead for the AMIPDH Network Tools monorepo at:
+            {project_path}
+
+            STEP 1 — Load project conventions:
+            Use the ProjectConventions tool with input 'all' to read
+            copilot-instructions.md, AGENTS.md, and README.md.
+
+            STEP 2 — Load the Copilot agent template:
+            Use the CopilotAgentTemplate tool with input '{template_name}'
+            to load the scaffolding conventions and patterns.
+
+            STEP 3 — Read existing code:
+            {context_step}
+
+            STEP 4 — Produce the implementation plan for:
+            ---
+            {feature_request}
+            ---
+
+            {rules}
+
+            CRITICAL: Structure your plan into these EXACT sections, in this
+            order. Use "## Section N — Label" as the heading for each.
+            The executor will implement each section in a SEPARATE pass,
+            so each section must be self-contained with enough detail to
+            implement without seeing the other sections.
+
+{sections_block}
+
+            For each section, include:
+            - Exact file paths to create
+            - Complete type definitions / schemas / interfaces
+            - Function signatures with parameter types and return types
+            - Import statements needed (what to import from where)
+            - Key implementation details (not pseudocode)
+        """,
+        agent=planner,
+        expected_output=(
+            f"A detailed implementation plan structured into exactly "
+            f"{len(chunk_template['chunks'])} sections using "
+            f"'## Section N — Label' headings, following "
+            f"{'React/TypeScript' if is_react else 'AMIPDH FastAPI'} conventions."
+        ),
+    )
+
+
+def create_chunk_execution_task(
+    chunk: dict,
+    section_plan: str,
+    written_so_far: list[str],
+    project_path: str,
+    template_name: str,
+) -> Task:
+    """
+    Create a focused execution task for a single chunk.
+
+    The prompt is kept small and specific — just the relevant plan section,
+    the list of already-written files, and the target files for this chunk.
+
+    Args:
+        chunk: One entry from a CHUNK_TEMPLATES 'chunks' list
+        section_plan: The extracted plan section for this chunk
+        written_so_far: List of file paths already written in previous chunks
+        project_path: Absolute path to the project root
+        template_name: Which Copilot agent template to load
+
+    Returns:
+        A single execution Task for Qwen
+    """
+    is_react = template_name == "react-app-generator"
+
+    target_files_list = "\n".join(f"  - {f}" for f in chunk["target_files"])
+
+    if written_so_far:
+        written_block = (
+            "Files already created in previous chunks (you can import from these):\n"
+            + "\n".join(f"  - {f}" for f in written_so_far)
+        )
+    else:
+        written_block = "This is the first chunk — no files have been created yet."
+
+    context_step = (
+        "Use the ReactUIContext tool to read existing frontend code for reference."
+        if is_react else
+        "Use the NetworkCheckerContext tool to read existing backend code for reference."
+    )
+
+    rules = (
+        "React implementation rules:\n"
+        "- Use functional components with TypeScript — no class components\n"
+        "- Define TypeScript interfaces for all props, state, and API types\n"
+        "- Use hooks for state and side effects (useState, useEffect, custom hooks)\n"
+        "- Keep components small and composable\n"
+        "- Put API calls in src/services/, not inside components\n"
+        "- Use environment variables for API URLs (.env)\n"
+        "- Add JSDoc comments to complex components and hooks"
+        if is_react else
+        "FastAPI implementation rules:\n"
+        "- Match the existing code style, indentation, and naming\n"
+        "- Use async def for all service functions\n"
+        "- Use Pydantic v2 models (model_config, field validators)\n"
+        "- Handle exceptions with try/except, return ok=False responses\n"
+        "- Add clear docstrings to all functions and classes\n"
+        "- Follow import order: stdlib, third-party, local"
+    )
+
+    return Task(
+        description=f"""
+            You are implementing one focused section of a larger feature for:
+            {project_path}
+
+            SECTION: {chunk['label']}
+            GOAL: {chunk['description']}
+
+            STEP 1 — Load the Copilot agent template:
+            Use the CopilotAgentTemplate tool with input '{template_name}'
+
+            STEP 2 — Read existing code:
+            {context_step}
+
+            STEP 3 — Review the plan for this section:
+            ---
+            {section_plan}
+            ---
+
+            {written_block}
+
+            {rules}
+
+            STEP 4 — Implement EXACTLY these files:
+{target_files_list}
+
+            CRITICAL OUTPUT FORMAT — you MUST follow this exactly:
+            For every file, output it like this:
+
+            ### relative/path/to/file.ext
+            ```language
+            ...full file contents here...
+            ```
+
+            Output ALL files listed above. Do not summarize or skip any file.
+            Do not say "I would create..." — actually output the full contents.
+            Each file must be COMPLETE — no placeholders, no "// TODO", no
+            "continue similarly". Every function body must be fully implemented.
+        """,
+        agent=executor,
+        expected_output=(
+            f"Complete implementation of: {', '.join(chunk['target_files'])}. "
+            f"Each file formatted as ### path followed by a code fence with "
+            f"full contents. No placeholders or stubs."
+        ),
+    )
+
+
 def detect_template(feature_request: str) -> str:
     """
     Auto-detect which Copilot agent template is relevant
