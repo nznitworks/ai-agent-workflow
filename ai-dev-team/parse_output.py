@@ -34,6 +34,11 @@ def parse_args():
         help="Project root to write files into (default: PROJECT_PATH env or cwd)"
     )
     parser.add_argument(
+        "--prefix",
+        default=None,
+        help="Folder prefix to prepend to all extracted file paths (e.g. 'frontend')"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print what would be written without actually writing"
@@ -140,10 +145,14 @@ def extract_files_from_separate_blocks(content: str) -> dict[str, str]:
     return files
 
 
-def write_files(files: dict[str, str], project_path: str, dry_run: bool = False) -> list[str]:
+def write_files(files: dict[str, str], project_path: str, prefix: str = None, dry_run: bool = False) -> list[str]:
     written = []
 
     for file_path, content in files.items():
+        # Skip files that already have the prefix
+        if prefix and not file_path.startswith(prefix + "/"):
+            file_path = os.path.join(prefix, file_path)
+
         if file_path.startswith("/"):
             full_path = file_path
         else:
@@ -179,8 +188,11 @@ def main():
         print(f"❌ Output file not found: {output_file}")
         return
 
+    prefix = args.prefix or "frontend"  # default to frontend/
+
     print(f"📖 Reading: {output_file}")
     print(f"📁 Project: {project_path}")
+    print(f"📂 Prefix:  {prefix}/")
     print(f"{'─' * 50}")
 
     with open(output_file, "r", encoding="utf-8") as f:
@@ -203,13 +215,14 @@ def main():
 
     print(f"✅ Found {len(files)} files to write:\n")
     for path in files:
-        print(f"   - {path}")
+        display = os.path.join(prefix, path) if not path.startswith(prefix) else path
+        print(f"   - {display}")
 
     print(f"\n{'─' * 50}")
     print("📝 Writing files...")
     print(f"{'─' * 50}")
 
-    written = write_files(files, project_path, dry_run=args.dry_run)
+    written = write_files(files, project_path, prefix=prefix, dry_run=args.dry_run)
 
     print(f"\n{'─' * 50}")
     if args.dry_run:
@@ -220,9 +233,10 @@ def main():
 
     if not args.dry_run:
         print("Next steps:")
-        print("   1. Open VS Code and review the generated files")
-        print("   2. Run Copilot Chat review")
-        print("   3. Run: npm install && npm run dev")
+        print(f"   1. cd {prefix}/")
+        print(f"   2. npm install")
+        print(f"   3. npm run dev")
+        print(f"   4. Open http://localhost:5173")
 
 
 if __name__ == "__main__":
