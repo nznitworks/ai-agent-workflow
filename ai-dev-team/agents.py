@@ -23,15 +23,17 @@ load_dotenv()
 
 # ─── Models ───────────────────────────────────────────────────────────────────
 
-# CrewAI's native LLM wrapper — works with both Anthropic and Ollama
+# Claude via CrewAI native LLM
 claude = LLM(
     model=f"anthropic/{os.getenv('CLAUDE_MODEL', 'claude-sonnet-4-5')}",
     api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 
+# Ollama via LiteLLM — must use ollama_chat/ prefix for chat models
 ollama_llm = LLM(
-    model=f"ollama/{os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:14b')}",
+    model=f"ollama_chat/{os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:14b')}",
     base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+    timeout=300,  # 5 min timeout — large model needs time
 )
 
 # ─── Tools ────────────────────────────────────────────────────────────────────
