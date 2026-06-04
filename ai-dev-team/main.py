@@ -37,6 +37,16 @@ def parse_args():
         action="store_true",
         help="Run GSOC security scan analysis instead of feature development",
     )
+    parser.add_argument(
+        "--chunked",
+        action="store_true",
+        help="Force chunked execution (split into smaller passes for Qwen)",
+    )
+    parser.add_argument(
+        "--no-chunk",
+        action="store_true",
+        help="Disable chunked execution (single-pass, even for large tasks)",
+    )
     return parser.parse_args()
 
 
@@ -258,6 +268,104 @@ def run_feature(feature_request: str, project_path: str):
     return result
 
 
+def run_chunked_feature(feature_request: str, project_path: str, chunk_template: dict):
+    """Run the chunked planner → multi-pass executor workflow.
+
+    Phase 1: Claude plans the entire feature in one call, structured into sections.
+    Phase 2: Qwen executes each section independently with a focused prompt.
+    """
+    from agents import planner, executor
+    from tasks import create_chunked_planning_task, create_chunk_execution_task
+
+    template_name = chunk_template["template_name"]
+    chunks = chunk_template["chunks"]
+    total_chunks = len(chunks)
+
+    print(f"\n🚀 AI Dev Team — Chunked Mode ({total_chunks} chunks)")
+    print(f"   Project  : {project_path}")
+    print(f"   Feature  : {feature_request[:80]}{'...' if len(feature_request) > 80 else ''}")
+    print(f"   Template : {template_name}")
+    print(f"   Chunks   :")
+    for i, chunk in enumerate(chunks, 1):
+        print(f"     {i}. {chunk['label']} ({len(chunk['target_files'])} files)")
+
+    # ── Phase 1: Claude plans everything ─────────────────────────────────
+    print(f"\n{'─' * 50}")
+    print("📋 Phase 1: Claude is planning all sections...")
+    print(f"{'─' * 50}\n")
+
+    planning_task = create_chunked_planning_task(
+        feature_request, project_path, chunk_template
+    )
+
+    planning_crew = Crew(
+        agents=[planner],
+        tasks=[planning_task],
+        process=Process.sequential,
+        verbose=True,
+    )
+
+    plan_result = planning_crew.kickoff()
+    full_plan = str(plan_result.raw) if hasattr(plan_result, "raw") else str(plan_result)
+
+    # Save the full plan for reference
+    plan_path = os.path.join(project_path, "ai-dev-team-plan.md")
+    with open(plan_path, "w", encoding="utf-8") as f:
+        f.write(f"# AI Dev Team Plan\n\n{full_plan}")
+    print(f"\n   📄 Full plan saved to: {plan_path}")
+
+    # ── Phase 2: Qwen executes each chunk ────────────────────────────────
+    all_written = []
+
+    for i, chunk in enumerate(chunks, 1):
+        print(f"\n{'─' * 50}")
+        print(f"🔨 Phase 2 — Chunk {i}/{total_chunks}: {chunk['label']}")
+        print(f"   Target files: {', '.join(chunk['target_files'])}")
+        print(f"{'─' * 50}\n")
+
+        section_plan = extract_plan_section(full_plan, i, chunk["label"])
+
+        exec_task = create_chunk_execution_task(
+            chunk=chunk,
+            section_plan=section_plan,
+            written_so_far=all_written,
+            project_path=project_path,
+            template_name=template_name,
+        )
+
+        exec_crew = Crew(
+            agents=[executor],
+            tasks=[exec_task],
+            process=Process.sequential,
+            verbose=True,
+        )
+
+        result = exec_crew.kickoff()
+        output = str(result.raw) if hasattr(result, "raw") else str(result)
+
+        written = extract_and_write_files(output, project_path)
+        all_written.extend(written)
+
+        print(f"\n   ✅ Chunk {i}/{total_chunks}: {chunk['label']} — wrote {len(written)} files")
+
+        if not written:
+            # Save raw output for this chunk so nothing is lost
+            chunk_output_path = os.path.join(
+                project_path, f"ai-dev-team-chunk-{i}-output.md"
+            )
+            with open(chunk_output_path, "w", encoding="utf-8") as f:
+                f.write(f"# Chunk {i}: {chunk['label']}\n\n{output}")
+            print(f"   ⚠️  No files extracted. Raw output saved to: {chunk_output_path}")
+
+    # ── Summary ──────────────────────────────────────────────────────────
+    print(f"\n{'═' * 50}")
+    print(f"🏁 Chunked execution complete: {len(all_written)} files written")
+    print(f"{'═' * 50}")
+    print_copilot_review_reminder(all_written)
+
+    return all_written
+
+
 def run_gsoc(project_path: str):
     """Run the GSOC security scan analysis workflow."""
     from agents import analyzer
@@ -320,7 +428,27 @@ def main():
         if not feature_request:
             print("❌ No feature request provided.")
             sys.exit(1)
-        run_feature(feature_request, project_path)
+
+        # Determine execution mode: chunked vs single-pass
+        from tasks import detect_chunk_template
+
+        if args.no_chunk:
+            # User explicitly disabled chunking
+            chunk_template = None
+        elif args.chunked:
+            # User forced chunking — detect which template
+            chunk_template = detect_chunk_template(feature_request)
+            if not chunk_template:
+                print("⚠️  --chunked flag used but no matching chunk template found.")
+                print("   Falling back to single-pass execution.")
+        else:
+            # Auto-detect: chunk only if the request matches a template
+            chunk_template = detect_chunk_template(feature_request)
+
+        if chunk_template:
+            run_chunked_feature(feature_request, project_path, chunk_template)
+        else:
+            run_feature(feature_request, project_path)
 
 
 if __name__ == "__main__":
