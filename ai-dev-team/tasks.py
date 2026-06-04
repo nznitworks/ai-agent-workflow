@@ -9,6 +9,154 @@ Tasks:
 from crewai import Task
 from agents import planner, executor, analyzer
 
+# ─── Chunk Templates ─────────────────────────────────────────────────────────
+# Predefined chunk sequences for large scaffold tasks.
+# Each chunk is a focused sub-task that Qwen can complete without truncating.
+
+CHUNK_TEMPLATES = {
+    "react-scaffold": {
+        "template_name": "react-app-generator",
+        "trigger_keywords": [
+            "scaffold", "full frontend", "create frontend",
+            "all components", "complete frontend", "entire frontend",
+            "frontend scaffold",
+        ],
+        "chunks": [
+            {
+                "label": "Types & Services",
+                "description": "Create TypeScript interfaces matching Pydantic schemas and the Axios API service layer",
+                "target_files": [
+                    "frontend/src/types/api.ts",
+                    "frontend/src/services/api.ts",
+                ],
+            },
+            {
+                "label": "Hooks",
+                "description": "Create all React Query hooks for API calls",
+                "target_files": [
+                    "frontend/src/hooks/useHttpCheck.ts",
+                    "frontend/src/hooks/useEgressCheck.ts",
+                    "frontend/src/hooks/useDnsCheck.ts",
+                    "frontend/src/hooks/useTcpCheck.ts",
+                    "frontend/src/hooks/useHealth.ts",
+                ],
+            },
+            {
+                "label": "Components",
+                "description": "Create reusable UI components",
+                "target_files": [
+                    "frontend/src/components/CheckForm/CheckForm.tsx",
+                    "frontend/src/components/ResultCard/ResultCard.tsx",
+                    "frontend/src/components/StatusBadge/StatusBadge.tsx",
+                    "frontend/src/components/LatencyBadge/LatencyBadge.tsx",
+                    "frontend/src/components/ErrorBoundary/ErrorBoundary.tsx",
+                ],
+            },
+            {
+                "label": "Pages",
+                "description": "Create page components with routing",
+                "target_files": [
+                    "frontend/src/pages/Dashboard.tsx",
+                    "frontend/src/pages/HttpCheck.tsx",
+                    "frontend/src/pages/EgressCheck.tsx",
+                    "frontend/src/pages/DnsCheck.tsx",
+                    "frontend/src/pages/TcpCheck.tsx",
+                    "frontend/src/pages/Health.tsx",
+                ],
+            },
+            {
+                "label": "Config & Entry",
+                "description": "Create project configuration files and app entry point",
+                "target_files": [
+                    "frontend/package.json",
+                    "frontend/vite.config.ts",
+                    "frontend/tsconfig.json",
+                    "frontend/tailwind.config.ts",
+                    "frontend/.env.example",
+                    "frontend/src/App.tsx",
+                    "frontend/src/main.tsx",
+                ],
+            },
+        ],
+    },
+    "fastapi-scaffold": {
+        "template_name": "fastapi-app-generator",
+        "trigger_keywords": [
+            "scaffold", "full backend", "create backend",
+            "all endpoints", "complete backend", "entire backend",
+            "backend scaffold",
+        ],
+        "chunks": [
+            {
+                "label": "Schemas",
+                "description": "Create Pydantic v2 request/response models",
+                "target_files": [
+                    "backend/app/schemas/checks.py",
+                    "backend/app/schemas/health.py",
+                ],
+            },
+            {
+                "label": "Services",
+                "description": "Create async service functions using httpx.AsyncClient",
+                "target_files": [
+                    "backend/app/services/network_checks.py",
+                ],
+            },
+            {
+                "label": "Routes & Config",
+                "description": "Create route handlers, router wiring, config, and app entry",
+                "target_files": [
+                    "backend/app/api/routes/health.py",
+                    "backend/app/api/routes/network_checks.py",
+                    "backend/app/api/router.py",
+                    "backend/app/core/config.py",
+                    "backend/app/main.py",
+                ],
+            },
+            {
+                "label": "Tests & Docs",
+                "description": "Create tests and update documentation",
+                "target_files": [
+                    "backend/tests/test_health.py",
+                    "backend/tests/test_network_checks.py",
+                    "backend/README.md",
+                    "backend/AGENTS.md",
+                ],
+            },
+        ],
+    },
+}
+
+
+def detect_chunk_template(feature_request: str) -> dict | None:
+    """
+    Check if a feature request matches a chunk template for multi-pass execution.
+
+    Scans the feature request for trigger keywords from each template.
+    When multiple templates match (e.g. both share a generic keyword like
+    "scaffold"), the template with the most keyword hits wins.
+    Returns the matching template dict, or None if the task is small enough
+    for single-pass execution.
+
+    Args:
+        feature_request: The user's feature description
+
+    Returns:
+        The matching CHUNK_TEMPLATES entry, or None
+    """
+    feature_lower = feature_request.lower()
+
+    best_match = None
+    best_score = 0
+
+    for template in CHUNK_TEMPLATES.values():
+        score = sum(1 for kw in template["trigger_keywords"] if kw in feature_lower)
+        if score > best_score:
+            best_score = score
+            best_match = template
+
+    return best_match
+
 
 def detect_template(feature_request: str) -> str:
     """
