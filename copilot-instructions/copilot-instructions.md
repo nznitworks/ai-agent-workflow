@@ -4,7 +4,7 @@
 
 This is a monorepo containing network tooling and AI development utilities:
 
-- **network-health-checker/** - FastAPI backend for Kubernetes/OpenShift network diagnostics
+- **backend/** - FastAPI backend for Kubernetes/OpenShift network diagnostics
 - **ai-dev-team/** - Multi-agent AI workflow tool (Claude + Qwen + Copilot)
 - **ansible-local-testing/** - Ansible playbooks for local testing
 - **.github/agents/** - Custom Copilot agents (FastAPI/React generators, GSOC scanner)
@@ -66,7 +66,7 @@ Check endpoints (all POST):
 ### Running the App
 
 ```bash
-cd network-health-checker
+cd backend
 
 # Setup (first time)
 python3.11 -m venv .venv
@@ -84,7 +84,7 @@ docker run --rm -p 8080:8080 network-check-backend:local
 ### Testing
 
 ```bash
-cd network-health-checker
+cd backend
 
 # Install test dependencies
 pip install -r requirements-dev.txt
@@ -117,7 +117,7 @@ DEFAULT_TIMEOUT_SECONDS=5.0
 
 **Helm:**
 ```bash
-cd network-health-checker
+cd backend
 
 # Validate chart
 helm lint helm/
@@ -166,8 +166,8 @@ Before merging changes to network-health-checker:
 ### Documentation Sync
 
 When changing API routes, schemas, runtime behavior, or deployment config:
-- Update `network-health-checker/README.md` (user-facing)
-- Update `network-health-checker/AGENTS.md` (AI agent instructions)
+- Update `backend/README.md` (user-facing)
+- Update `backend/AGENTS.md` (AI agent instructions)
 
 ## AI Dev Team
 
@@ -262,8 +262,8 @@ Return 422 for validation errors automatically via FastAPI.
 2. Implement async check logic in `app/services/network_checks.py`
 3. Add route handler in `app/api/routes/network_checks.py`
 4. Add tests in `tests/test_network_checks.py`
-5. Update `network-health-checker/README.md` with endpoint docs
-6. Update `network-health-checker/AGENTS.md` with behavior notes
+5. Update `backend/README.md` with endpoint docs
+6. Update `backend/AGENTS.md` with behavior notes
 
 ### Modify existing check behavior
 
