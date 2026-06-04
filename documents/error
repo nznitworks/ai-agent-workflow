@@ -1,0 +1,22 @@
+/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/agents.py:33: LangChainDeprecationWarning: The class `Ollama` was deprecated in LangChain 0.3.1 and will be removed in 1.0.0. An updated version of the class exists in the `langchain-ollama package and should be used instead. To use it run `pip install -U `langchain-ollama` and import as `from `langchain_ollama import OllamaLLM``.
+  ollama_llm = Ollama(
+Traceback (most recent call last):
+  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 132, in <module>
+    main()
+  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 128, in main
+    run(feature_request, project_path)
+  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 78, in run
+    from agents import planner, executor
+  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/agents.py", line 50, in <module>
+    planner = Agent(
+              ^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/pydantic/main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 2 validation errors for Agent
+llm.str
+  Input should be a valid string [type=string_type, input_value=ChatAnthropic(profile={'n...****'), model_kwargs={}), input_type=ChatAnthropic]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+llm.BaseLLM
+  Input should be a valid dictionary or instance of BaseLLM [type=model_type, input_value=ChatAnthropic(profile={'n...****'), model_kwargs={}), input_type=ChatAnthropic]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
