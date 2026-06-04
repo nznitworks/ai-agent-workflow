@@ -1,0 +1,47 @@
+models:
+  - title: Claude Sonnet (Planner)
+    provider: anthropic
+    model: claude-sonnet-4-5
+    apiKey: your-anthropic-api-key
+
+  - title: Qwen Coder 14B (Executor)
+    provider: ollama
+    model: qwen2.5-coder:14b
+    apiBase: http://localhost:11434
+
+  - title: Qwen Coder 7B (Fast)
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://localhost:11434
+
+tabAutocompleteModel:
+  title: Autocomplete
+  provider: ollama
+  model: qwen2.5-coder:7b
+  apiBase: http://localhost:11434
+
+customCommands:
+  - name: plan
+    description: Plan a feature implementation
+    prompt: >
+      Act as a tech lead. Break down this feature request 
+      into a clear step-by-step implementation plan with 
+      file names and what to implement in each.
+
+  - name: review
+    description: Review selected code
+    prompt: >
+      Review this code for bugs, edge cases, security issues, 
+      and improvements. Be specific and actionable.
+
+  - name: test
+    description: Write unit tests
+    prompt: >
+      Write comprehensive unit tests for this code. 
+      Cover happy path, edge cases, and error cases.
+
+  - name: explain
+    description: Explain selected code
+    prompt: >
+      Explain this code clearly. What does it do, 
+      how does it work, and are there any concerns?
