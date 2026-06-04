@@ -1,0 +1,146 @@
+Scaffold a new React TypeScript frontend for the AMIPDH Network Health 
+Checker. Place the project in: frontend/
+
+Tech stack:
+- Vite + React 18 + TypeScript
+- Tailwind CSS for styling
+- React Router v6 for navigation
+- TanStack Query (React Query) for API state management
+- Axios for HTTP calls
+- Vitest + React Testing Library for tests
+- ESLint + Prettier configured
+
+API base URL from environment variable: VITE_API_BASE_URL
+Backend base path: /api/v1
+
+Use these EXACT TypeScript interfaces derived from the FastAPI schemas:
+
+// HTTP Check
+interface HttpCheckRequest {
+  url: string
+  timeout_seconds?: number   // default 5.0, min 0.5, max 30.0
+  expected_status?: number   // default 200, min 100, max 599
+}
+interface HttpCheckResponse {
+  ok: boolean
+  url: string
+  status_code: number | null
+  latency_ms: number | null
+  detail: string
+}
+
+// Egress Check
+interface EgressCheckRequest {
+  urls: string[]             // min 1, max 50 items
+  timeout_seconds?: number   // default 5.0, min 0.5, max 30.0
+  expected_status?: number   // default 200, min 100, max 599
+}
+interface EgressUrlResult {
+  url: string
+  ok: boolean
+  status_code: number | null
+  latency_ms: number | null
+  detail: string
+}
+interface EgressCheckResponse {
+  ok: boolean
+  total: number
+  success_count: number
+  failure_count: number
+  results: EgressUrlResult[]
+  detail: string
+}
+
+// DNS Check
+interface DnsCheckRequest {
+  hostname: string           // min 1, max 253 chars
+  record_type?: 'A' | 'AAAA' // default 'A'
+}
+interface DnsCheckResponse {
+  ok: boolean
+  hostname: string
+  record_type: string
+  addresses: string[]
+  detail: string
+}
+
+// TCP Check
+interface TcpCheckRequest {
+  host: string               // min 1, max 253 chars
+  port: number               // min 1, max 65535
+  timeout_seconds?: number   // default 5.0, min 0.5, max 30.0
+}
+interface TcpCheckResponse {
+  ok: boolean
+  host: string
+  port: number
+  latency_ms: number | null
+  detail: string
+}
+
+// Health
+interface HealthResponse {
+  status: string
+}
+
+Project structure to generate:
+frontend/
+├── src/
+│   ├── types/
+│   │   └── api.ts           ← all interfaces above
+│   ├── services/
+│   │   └── api.ts           ← axios instance + typed API calls
+│   ├── hooks/
+│   │   ├── useHttpCheck.ts
+│   │   ├── useEgressCheck.ts
+│   │   ├── useDnsCheck.ts
+│   │   ├── useTcpCheck.ts
+│   │   └── useHealth.ts
+│   ├── components/
+│   │   ├── CheckForm/        ← reusable form wrapper
+│   │   ├── ResultCard/       ← ok/fail result display
+│   │   ├── StatusBadge/      ← green/red ok indicator
+│   │   ├── LatencyBadge/     ← latency_ms display
+│   │   └── ErrorBoundary/
+│   ├── pages/
+│   │   ├── Dashboard.tsx     ← all 4 checks with tabs
+│   │   ├── HttpCheck.tsx
+│   │   ├── EgressCheck.tsx   ← supports multiple URLs input
+│   │   ├── DnsCheck.tsx      ← A/AAAA toggle
+│   │   ├── TcpCheck.tsx
+│   │   └── Health.tsx        ← /health/live + /health/ready status
+│   ├── App.tsx               ← router setup
+│   └── main.tsx
+├── .env.example              ← VITE_API_BASE_URL=http://localhost:8080
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── README.md
+
+Form validation rules (match backend):
+- timeout_seconds: 0.5 to 30.0
+- expected_status: 100 to 599
+- port: 1 to 65535
+- DNS record_type: only A or AAAA (dropdown)
+- urls (egress): textarea, one URL per line, max 50
+- hostname/host: max 253 characters
+
+UI behavior:
+- Show latency_ms in milliseconds where available
+- Show ok as green checkmark, failure as red X with detail message
+- Egress results show per-URL table with pass/fail counts summary
+- DNS results show list of resolved addresses
+- Health page auto-refreshes every 30 seconds
+- Loading states during API calls
+- Error boundary catches unexpected failures
+
+Tests to include:
+- Renders each page without crashing
+- Form validation prevents submission with invalid input
+- Successful API response renders result correctly
+- Failed API response (ok: false) shows error detail
+- Mock all API calls — no real network requests in tests
+
+Follow react-app-generator agent conventions exactly.
+Functional components and hooks only — no class components.
+PascalCase for components, camelCase for functions and variables.
