@@ -1,0 +1,377 @@
+# AI Dev Team — Local Agent Workflow
+
+A multi-agent AI workflow using Claude (Planner), Ollama/Qwen (Executor), and GitHub Copilot (Reviewer) to automate feature development inside your projects.
+
+---
+
+## Overview
+
+```
+You describe a feature
+        ↓
+Claude (Planner)     → breaks it into a step-by-step implementation plan
+        ↓
+Qwen 14B (Executor)  → implements the code based on the plan
+        ↓
+Copilot (Reviewer)   → reviews the output inline in VS Code
+```
+
+---
+
+## Architecture
+
+```
+ai-dev-team/
+├── README.md
+├── .env                  ← API keys and config
+├── requirements.txt      ← Python dependencies
+├── main.py               ← Entry point, run this
+├── agents.py             ← Agent definitions (Planner + Executor)
+└── tasks.py              ← Task definitions for each agent
+```
+
+---
+
+## Prerequisites
+
+### Mac Mini (Server)
+- macOS with M-series chip (M4 recommended)
+- Ollama installed via official app from [ollama.com](https://ollama.com)
+- `qwen2.5-coder:14b` model pulled
+- Ollama exposed to local network (`OLLAMA_HOST=0.0.0.0`)
+
+### Client Mac
+- VS Code with Continue.dev extension installed
+- Python 3.10+
+- Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
+
+---
+
+## Setup
+
+### 1. Clone or copy this folder into your project
+
+```bash
+cp -r ai-dev-team/ your-project/ai-dev-team/
+cd your-project/ai-dev-team/
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure environment variables
+
+Copy `.env.example` to `.env` and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+```
+ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
+OLLAMA_BASE_URL=http://192.168.x.x:11434
+OLLAMA_MODEL=qwen2.5-coder:14b
+PROJECT_PATH=/Users/you/your-project
+```
+
+> If running on the Mac Mini itself, use `http://localhost:11434`
+> If running on a client Mac on the same network, use your Mac Mini's local IP
+> If running remotely via Tailscale, use your Tailscale IP (`100.x.x.x`)
+
+### 4. Start Ollama on Mac Mini
+
+```bash
+# Using the ollama-serve script
+./ollama-serve.sh start
+
+# Or manually
+OLLAMA_HOST=0.0.0.0 ollama serve
+```
+
+### 5. Pre-load the model (optional but recommended)
+
+```bash
+ollama run qwen2.5-coder:14b --keepalive 60m
+```
+
+---
+
+## Usage
+
+### Basic Usage
+
+```bash
+python main.py "add user authentication with JWT to the Express API"
+```
+
+### With explicit project path
+
+```bash
+python main.py "add a shopping cart feature" --project /Users/you/my-app
+```
+
+### Interactive mode
+
+```bash
+python main.py
+# then type your feature request when prompted
+```
+
+---
+
+## VS Code + Continue.dev Setup
+
+Install the Continue extension and configure `~/.continue/config.yaml`:
+
+### On Mac Mini (localhost)
+
+```yaml
+models:
+  - title: Claude Sonnet (Planner)
+    provider: anthropic
+    model: claude-sonnet-4-5
+    apiKey: your-anthropic-api-key
+
+  - title: Qwen Coder 14B (Executor)
+    provider: ollama
+    model: qwen2.5-coder:14b
+    apiBase: http://localhost:11434
+
+tabAutocompleteModel:
+  title: Autocomplete
+  provider: ollama
+  model: qwen2.5-coder:7b
+  apiBase: http://localhost:11434
+
+customCommands:
+  - name: plan
+    description: Plan a feature implementation
+    prompt: >
+      Act as a tech lead. Break down this feature request
+      into a clear step-by-step implementation plan with
+      file names and what to implement in each.
+
+  - name: review
+    description: Review selected code
+    prompt: >
+      Review this code for bugs, edge cases, security issues,
+      and improvements. Be specific and actionable.
+
+  - name: test
+    description: Write unit tests
+    prompt: >
+      Write comprehensive unit tests for this code.
+      Cover happy path, edge cases, and error cases.
+
+  - name: explain
+    description: Explain selected code
+    prompt: >
+      Explain this code clearly. What does it do,
+      how does it work, and are there any concerns?
+```
+
+### On Client Mac (network)
+
+Same config but change `apiBase`:
+```yaml
+apiBase: http://192.168.x.x:11434   # local network
+# or
+apiBase: http://100.x.x.x:11434    # via Tailscale
+```
+
+---
+
+## Continue.dev Shortcuts
+
+| Shortcut | Action |
+|---|---|
+| `Cmd+L` | Open Continue chat |
+| `Cmd+I` | Inline edit on selected code |
+| `Cmd+Shift+L` | Add selected code to chat |
+| `/plan` | Plan a feature |
+| `/review` | Review selected code |
+| `/test` | Write unit tests |
+| `/explain` | Explain selected code |
+
+---
+
+## Day-to-Day Workflow
+
+```
+1. Describe your feature
+   python main.py "your feature description"
+
+2. Claude plans it (you see it thinking in real time)
+
+3. Qwen implements the code directly into your project files
+
+4. Open changed files in VS Code
+
+5. Ask Copilot Chat to review:
+   "Review this for bugs and security issues"
+
+6. Accept/reject suggestions, run tests, commit
+```
+
+---
+
+## Tool Roles
+
+| Tool | Role | Best For |
+|---|---|---|
+| **claude.ai** | Consultant | Architecture decisions, long discussions |
+| **Claude (Continue)** | Senior Architect | Planning, complex reasoning |
+| **Qwen 14B (Continue/Ollama)** | Developer | Writing and editing code |
+| **Copilot (autocomplete)** | Junior Dev | Inline suggestions while typing |
+| **Copilot Chat** | Codebase Expert | Questions about existing code |
+| **CrewAI (this tool)** | Autonomous Worker | Full feature implementation |
+
+---
+
+## Query Routing Guide
+
+| Task | Use |
+|---|---|
+| Autocomplete while typing | Copilot |
+| Questions about existing code | Copilot Chat |
+| Plan a new feature | Continue → Claude Sonnet |
+| Write or edit code | Continue → Qwen 14B (`Cmd+I`) |
+| Review code | Copilot Chat or Continue → Claude |
+| Write tests | Continue → `/test` → Qwen 14B |
+| Full feature end-to-end | `python main.py "feature"` |
+| Architecture decisions | claude.ai (this chat) |
+| Private/sensitive code | Continue → Qwen (stays local) |
+
+---
+
+## GitHub Copilot — Review Step (Manual)
+
+Copilot cannot be automated via script — it lives inside VS Code and has no external API. It is intentionally the **human checkpoint** in the workflow, which is good practice: you should always review AI-generated code before committing.
+
+### Automation Status
+
+| Tool | Automated? |
+|---|---|
+| Claude (Planner) | ✅ Yes — runs via script |
+| Qwen/Ollama (Executor) | ✅ Yes — runs via script |
+| GitHub Copilot (Reviewer) | ❌ No — manual step in VS Code |
+
+### How to Do the Copilot Review
+
+After `main.py` finishes, the script will remind you with this prompt:
+
+```
+✅ Implementation complete!
+
+📋 Next Step — Copilot Review (manual):
+   1. Open VS Code
+   2. Select the changed files
+   3. Open Copilot Chat (Ctrl+Shift+I)
+   4. Paste this prompt:
+
+   "Review the recently generated code for bugs,
+    edge cases, security issues, and improvements.
+    Be specific and actionable."
+
+   5. Accept/reject suggestions
+   6. Run your tests
+   7. Commit if passing
+```
+
+### Copilot Chat Review Prompts
+
+Use these inside Copilot Chat after the agent run:
+
+**General review:**
+```
+Review the recently generated code for bugs, edge cases,
+security issues, and improvements. Be specific and actionable.
+```
+
+**Security focused:**
+```
+Review this code specifically for security vulnerabilities,
+input validation issues, and authentication weaknesses.
+```
+
+**Performance focused:**
+```
+Review this code for performance issues, unnecessary loops,
+missing indexes, or inefficient queries.
+```
+
+**Test coverage:**
+```
+What test cases are missing from this implementation?
+List edge cases that are not currently handled.
+```
+
+### Copilot Shortcuts for Review
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+Shift+I` | Open Copilot Chat |
+| Select code → Copilot Chat | Review selected block |
+| `Cmd+I` | Inline fix suggestion |
+| `/explain` | Explain selected code |
+| `/fix` | Fix selected code |
+| `/tests` | Generate tests for selection |
+
+---
+
+## Troubleshooting
+
+### "Unable to connect to local Ollama"
+```bash
+# Check Ollama is running and exposed
+curl http://192.168.x.x:11434
+# Should return: Ollama is running
+
+# If not, start it with network exposure
+OLLAMA_HOST=0.0.0.0 ollama serve
+```
+
+### Model not loading
+```bash
+# Check model is pulled
+ollama list
+
+# Pull if missing
+ollama pull qwen2.5-coder:14b
+```
+
+### Slow first response
+Normal — Ollama loads the model on first request (~10-30 seconds for 14B). Pre-load it:
+```bash
+ollama run qwen2.5-coder:14b --keepalive 60m
+```
+
+### llama-server binary not found
+Reinstall Ollama using the official Mac app from [ollama.com](https://ollama.com) instead of Homebrew.
+
+---
+
+## Network Configuration
+
+| Location | Ollama URL |
+|---|---|
+| On Mac Mini | `http://localhost:11434` |
+| Same WiFi/LAN | `http://192.168.x.x:11434` |
+| Via Tailscale | `http://100.x.x.x:11434` |
+
+---
+
+## Cost Estimate
+
+| Component | Cost |
+|---|---|
+| Ollama (Qwen) | Free — runs locally |
+| Claude API (Planner) | ~$0.01–0.05 per feature (pay-as-you-go) |
+| GitHub Copilot | Covered by your Office license |
+| Claude Pro (claude.ai) | Covered by your Pro subscription |
+
+Claude API is only used for planning and review — Qwen handles all code generation locally at zero cost.
