@@ -8,9 +8,7 @@ Agents:
 """
 
 import os
-from crewai import Agent
-from langchain_anthropic import ChatAnthropic
-from langchain_community.llms import Ollama
+from crewai import Agent, LLM
 from crewai_tools import FileReadTool, FileWriterTool
 from tools import (
     CopilotAgentTemplateTool,
@@ -25,13 +23,14 @@ load_dotenv()
 
 # ─── Models ───────────────────────────────────────────────────────────────────
 
-claude = ChatAnthropic(
-    model=os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5"),
-    anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
+# CrewAI's native LLM wrapper — works with both Anthropic and Ollama
+claude = LLM(
+    model=f"anthropic/{os.getenv('CLAUDE_MODEL', 'claude-sonnet-4-5')}",
+    api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 
-ollama_llm = Ollama(
-    model=os.getenv("OLLAMA_MODEL", "qwen2.5-coder:14b"),
+ollama_llm = LLM(
+    model=f"ollama/{os.getenv('OLLAMA_MODEL', 'qwen2.5-coder:14b')}",
     base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
 )
 
