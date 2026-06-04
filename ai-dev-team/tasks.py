@@ -2,8 +2,13 @@
 tasks.py — Task definitions for the AI Dev Team workflow
 
 Tasks:
-  - create_tasks      : planning + execution for feature development
-  - create_gsoc_tasks : GSOC security scan analysis
+  - create_tasks                : planning + execution for single-pass features
+  - create_chunked_planning_task: planning for multi-pass chunked execution
+  - create_chunk_execution_task : execution for one chunk of a larger task
+  - create_gsoc_tasks           : GSOC security scan analysis
+
+Data:
+  - CHUNK_TEMPLATES             : predefined chunk sequences for scaffold tasks
 """
 
 from crewai import Task

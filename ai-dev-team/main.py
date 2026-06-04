@@ -5,7 +5,12 @@ Usage:
     python main.py "add a TCP proxy check endpoint"
     python main.py "add shopping cart" --project /path/to/project
     python main.py --gsoc                        (run GSOC scan analysis)
+    python main.py --chunked "create full frontend scaffold"
+    python main.py --no-chunk "create full frontend scaffold"
     python main.py                               (interactive mode)
+
+Chunked mode splits large tasks into focused sub-tasks for Qwen 14B.
+Auto-detected for scaffold tasks, or forced with --chunked/--no-chunk.
 """
 
 import sys
