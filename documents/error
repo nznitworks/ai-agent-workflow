@@ -1,22 +1,400 @@
-/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/agents.py:33: LangChainDeprecationWarning: The class `Ollama` was deprecated in LangChain 0.3.1 and will be removed in 1.0.0. An updated version of the class exists in the `langchain-ollama package and should be used instead. To use it run `pip install -U `langchain-ollama` and import as `from `langchain_ollama import OllamaLLM``.
-  ollama_llm = Ollama(
+ERROR:root:Failed to connect to OpenAI API: Request timed out.
+ERROR:root:OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: Failed to connect to OpenAI API: Request timed out.                                                                                 │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[CrewAIEventsBus] Warning: Event pairing mismatch. 'llm_call_failed' closed 'agent_execution_started' (expected 'llm_call_started')
+An unknown error occurred. Please check the details below.
+Error details: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.                                                         │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+ERROR:crewai.flow.flow:Error executing listener call_llm_native_tools: Failed to connect to OpenAI API: Request timed out.
+An unknown error occurred. Please check the details below.
+Error details: Failed to connect to OpenAI API: Request timed out.
+╭───────────────────────────────────────────────────────────── 🤖 Agent Started ──────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  Agent: Senior Developer                                                                                                                    │
+│                                                                                                                                             │
+│  Task:                                                                                                                                      │
+│              You are the senior developer implementing a feature for:                                                                       │
+│              /Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools                                                                    │
+│                                                                                                                                             │
+│              STEP 1 — Load the Copilot agent template:                                                                                      │
+│              Use the CopilotAgentTemplate tool with input 'react-app-generator'                                                             │
+│              to load the scaffolding patterns and use them as your reference.                                                               │
+│                                                                                                                                             │
+│              STEP 2 — Read existing code for each file you will modify:                                                                     │
+│              Use the ReactUIContext tool to read existing components, pages, hooks, and config before making changes.                       │
+│                                                                                                                                             │
+│              STEP 3 — Implement all files from the plan:                                                                                    │
+│              React implementation rules:                                                                                                    │
+│              - Use functional components with TypeScript — no class components                                                              │
+│              - Define TypeScript interfaces for all props, state, and API types                                                             │
+│              - Use hooks for state and side effects (useState, useEffect, custom hooks)                                                     │
+│              - Keep components small and composable                                                                                         │
+│              - Put API calls in src/services/, not inside components                                                                        │
+│              - Use environment variables for API URLs (.env)                                                                                │
+│              - Add JSDoc comments to complex components and hooks                                                                           │
+│                                                                                                                                             │
+│              STEP 4 — Write tests:                                                                                                          │
+│              - Use Vitest or Jest with React Testing Library                                                                                │
+│              - Test rendering, user interactions, and API calls (mock fetch/axios)                                                          │
+│              - No real API calls in tests — mock all external services                                                                      │
+│                                                                                                                                             │
+│              Write all files directly to the project directory.                                                                             │
+│                                                                                                                                             │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+ERROR:root:Failed to connect to OpenAI API: Request timed out.
+ERROR:root:OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: Failed to connect to OpenAI API: Request timed out.                                                                                 │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[CrewAIEventsBus] Warning: Event pairing mismatch. 'llm_call_failed' closed 'agent_execution_started' (expected 'llm_call_started')
+An unknown error occurred. Please check the details below.
+Error details: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.                                                         │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+ERROR:crewai.flow.flow:Error executing listener call_llm_native_tools: Failed to connect to OpenAI API: Request timed out.
+An unknown error occurred. Please check the details below.
+Error details: Failed to connect to OpenAI API: Request timed out.
+╭───────────────────────────────────────────────────────────── 🤖 Agent Started ──────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  Agent: Senior Developer                                                                                                                    │
+│                                                                                                                                             │
+│  Task:                                                                                                                                      │
+│              You are the senior developer implementing a feature for:                                                                       │
+│              /Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools                                                                    │
+│                                                                                                                                             │
+│              STEP 1 — Load the Copilot agent template:                                                                                      │
+│              Use the CopilotAgentTemplate tool with input 'react-app-generator'                                                             │
+│              to load the scaffolding patterns and use them as your reference.                                                               │
+│                                                                                                                                             │
+│              STEP 2 — Read existing code for each file you will modify:                                                                     │
+│              Use the ReactUIContext tool to read existing components, pages, hooks, and config before making changes.                       │
+│                                                                                                                                             │
+│              STEP 3 — Implement all files from the plan:                                                                                    │
+│              React implementation rules:                                                                                                    │
+│              - Use functional components with TypeScript — no class components                                                              │
+│              - Define TypeScript interfaces for all props, state, and API types                                                             │
+│              - Use hooks for state and side effects (useState, useEffect, custom hooks)                                                     │
+│              - Keep components small and composable                                                                                         │
+│              - Put API calls in src/services/, not inside components                                                                        │
+│              - Use environment variables for API URLs (.env)                                                                                │
+│              - Add JSDoc comments to complex components and hooks                                                                           │
+│                                                                                                                                             │
+│              STEP 4 — Write tests:                                                                                                          │
+│              - Use Vitest or Jest with React Testing Library                                                                                │
+│              - Test rendering, user interactions, and API calls (mock fetch/axios)                                                          │
+│              - No real API calls in tests — mock all external services                                                                      │
+│                                                                                                                                             │
+│              Write all files directly to the project directory.                                                                             │
+│                                                                                                                                             │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+ERROR:root:Failed to connect to OpenAI API: Request timed out.
+ERROR:root:OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: Failed to connect to OpenAI API: Request timed out.                                                                                 │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+[CrewAIEventsBus] Warning: Event pairing mismatch. 'llm_call_failed' closed 'agent_execution_started' (expected 'llm_call_started')
+
+An unknown error occurred. Please check the details below.
+╭─────────────────────────────────────────────────────────────── ❌ LLM Error ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  LLM Call Failed                                                                                                                            │
+│  Error: OpenAI API call failed: Failed to connect to OpenAI API: Request timed out.                                                         │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+Error details: Failed to connect to OpenAI API: Request timed out.
+
+ERROR:crewai.flow.flow:Error executing listener call_llm_native_tools: Failed to connect to OpenAI API: Request timed out.
+An unknown error occurred. Please check the details below.
+Error details: Failed to connect to OpenAI API: Request timed out.
+[CrewAIEventsBus] Warning: Event pairing mismatch. 'task_failed' closed 'agent_execution_started' (expected 'task_started')
+╭────────────────────────────────────────────────────────────── 📋 Task Failure ──────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  Task Failed                                                                                                                                │
+│  Name:                                                                                                                                      │
+│              You are the senior developer implementing a feature for:                                                                       │
+│              /Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools                                                                    │
+│                                                                                                                                             │
+│              STEP 1 — Load the Copilot agent template:                                                                                      │
+│              Use the CopilotAgentTemplate tool with input 'react-app-generator'                                                             │
+│              to load the scaffolding patterns and use them as your reference.                                                               │
+│                                                                                                                                             │
+│              STEP 2 — Read existing code for each file you will modify:                                                                     │
+│              Use the ReactUIContext tool to read existing components, pages, hooks, and config before making changes.                       │
+│                                                                                                                                             │
+│              STEP 3 — Implement all files from the plan:                                                                                    │
+│              React implementation rules:                                                                                                    │
+│              - Use functional components with TypeScript — no class components                                                              │
+│              - Define TypeScript interfaces for all props, state, and API types                                                             │
+│              - Use hooks for state and side effects (useState, useEffect, custom hooks)                                                     │
+│              - Keep components small and composable                                                                                         │
+│              - Put API calls in src/services/, not inside components                                                                        │
+│              - Use environment variables for API URLs (.env)                                                                                │
+│              - Add JSDoc comments to complex components and hooks                                                                           │
+│                                                                                                                                             │
+│              STEP 4 — Write tests:                                                                                                          │
+│              - Use Vitest or Jest with React Testing Library                                                                                │
+│              - Test rendering, user interactions, and API calls (mock fetch/axios)                                                          │
+│              - No real API calls in tests — mock all external services                                                                      │
+│                                                                                                                                             │
+│              Write all files directly to the project directory.                                                                             │
+│                                                                                                                                             │
+│  Agent: Senior Developer                                                                                                                    │
+│                                                                                                                                             │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+[CrewAIEventsBus] Warning: Event pairing mismatch. 'crew_kickoff_failed' closed 'agent_execution_started' (expected 'crew_kickoff_started')
+
+
+╭───────────────────────────────────────────────────────────── Execution Traces ──────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  🔍 Detailed execution traces are available!                                                                                                │
+│                                                                                                                                             │
+│  View insights including:                                                                                                                   │
+│    • Agent decision-making process                                                                                                          │
+│    • Task execution flow and timing                                                                                                         │
+│    • Tool usage details                                                                                                                     │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+Traceback (most recent call last):
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+Would you like to view your execution traces? [y/N] (20s timeout): 
+
+╭───────────────────────────────────────────────────────── Tracing Preference Saved ──────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  Info: Tracing has been disabled.                                                                                                           │
+│                                                                                                                                             │
+│  Your preference has been saved. Future Crew/Flow executions will not collect traces.                                                       │
+│                                                                                                                                             │
+│  To enable tracing later, do any one of these:                                                                                              │
+│  • Set tracing=True in your Crew/Flow code                                                                                                  │
+│  • Set CREWAI_TRACING_ENABLED=true in your project's .env file                                                                              │
+│  • Run: crewai traces enable                                                                                                                │
+│                                                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+    yield
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_sync/connection.py", line 101, in handle_request
+    raise exc
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_sync/connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_sync/connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_backends/sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_base_client.py", line 1037, in request
+    response = self._send_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_client.py", line 440, in _send_request
+    return self._send_with_auth_retry(request, stream=stream, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_client.py", line 418, in _send_with_auth_retry
+    response = super()._send_request(request, stream=stream, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_base_client.py", line 964, in _send_request
+    return self._client.send(request, stream=stream, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/llms/providers/openai/completion.py", line 1618, in _handle_completion
+    response: ChatCompletion = self._get_sync_client().chat.completions.create(
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/openai/_base_client.py", line 1055, in request
+    raise APITimeoutError(request=request) from err
+openai.APITimeoutError: Request timed out.
+
+The above exception was the direct cause of the following exception:
+
 Traceback (most recent call last):
   File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 132, in <module>
     main()
   File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 128, in main
     run(feature_request, project_path)
-  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 78, in run
-    from agents import planner, executor
-  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/agents.py", line 50, in <module>
-    planner = Agent(
-              ^^^^^^
-  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/pydantic/main.py", line 250, in __init__
-    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-pydantic_core._pydantic_core.ValidationError: 2 validation errors for Agent
-llm.str
-  Input should be a valid string [type=string_type, input_value=ChatAnthropic(profile={'n...****'), model_kwargs={}), input_type=ChatAnthropic]
-    For further information visit https://errors.pydantic.dev/2.12/v/string_type
-llm.BaseLLM
-  Input should be a valid dictionary or instance of BaseLLM [type=model_type, input_value=ChatAnthropic(profile={'n...****'), model_kwargs={}), input_type=ChatAnthropic]
-    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+  File "/Users/pk21rw/Documents/Germany/P33435-AMIPDH-Network-Tools/ai-dev-team/main.py", line 97, in run
+    result = crew.kickoff()
+             ^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/crew.py", line 1012, in kickoff
+    result = self._run_sequential_process()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/crew.py", line 1458, in _run_sequential_process
+    return self._execute_tasks(self.tasks)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/crew.py", line 1557, in _execute_tasks
+    task_output = task.execute_sync(
+                  ^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/task.py", line 580, in execute_sync
+    return self._execute_core(agent, context, tools)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/task.py", line 882, in _execute_core
+    raise e
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/task.py", line 790, in _execute_core
+    result = agent.execute_task(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 828, in execute_task
+    result = self._handle_execution_error(e, task, context, tools)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 738, in _handle_execution_error
+    return self.execute_task(task, context, tools)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 828, in execute_task
+    result = self._handle_execution_error(e, task, context, tools)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 738, in _handle_execution_error
+    return self.execute_task(task, context, tools)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 828, in execute_task
+    result = self._handle_execution_error(e, task, context, tools)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 737, in _handle_execution_error
+    self._check_execution_error(e, task)
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 717, in _check_execution_error
+    raise e
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 815, in execute_task
+    result = self._execute_without_timeout(task_prompt, task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/agent/core.py", line 880, in _execute_without_timeout
+    invoke_result = self.agent_executor.invoke(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/experimental/agent_executor.py", line 2675, in invoke
+    self.kickoff()
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2137, in kickoff
+    return asyncio.run(_run_flow())
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2125, in _run_flow
+    return await self.kickoff_async(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2375, in kickoff_async
+    await asyncio.gather(*tasks)
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2596, in _execute_start_method
+    await self._execute_listeners(start_method_name, result, finished_event_id)
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2822, in _execute_listeners
+    ) = await self._execute_single_listener(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 3149, in _execute_single_listener
+    await self._execute_listeners(
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2822, in _execute_listeners
+    ) = await self._execute_single_listener(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 3145, in _execute_single_listener
+    listener_result, finished_event_id = await self._execute_method(
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2762, in _execute_method
+    raise e
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow.py", line 2680, in _execute_method
+    result = await asyncio.to_thread(ctx.run, method, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/3.11.10/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/flow/flow_wrappers.py", line 94, in __call__
+    return self._meth(self._instance, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/experimental/agent_executor.py", line 1366, in call_llm_native_tools
+    answer = get_llm_response(
+             ^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/utilities/agent_utils.py", line 490, in get_llm_response
+    answer = llm.call(
+             ^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/llms/providers/openai/completion.py", line 440, in call
+    return self._call_completions(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/llms/providers/openai/completion.py", line 480, in _call_completions
+    return self._handle_completion(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/pk21rw/.pyenv/versions/ai-dev-team/lib/python3.11/site-packages/crewai/llms/providers/openai/completion.py", line 1713, in _handle_completion
+    raise ConnectionError(error_msg) from e
+ConnectionError: Failed to connect to OpenAI API: Request timed out.
+╭─────────────────────────────────────────────────────────────── Crew Failure ────────────────────────────────────────────────────────────────╮
+│                                                                                                                                             │
+│  Crew Execution Failed                                                                                                                      │
+│  Name: crew                                                                                                                                 │
+│  ID: 83bb4fa9-4888-450b-bcdd-26dbcc997d90                 
