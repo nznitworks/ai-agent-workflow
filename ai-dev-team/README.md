@@ -26,8 +26,9 @@ ai-dev-team/
 ├── .env                  ← API keys and config
 ├── requirements.txt      ← Python dependencies
 ├── main.py               ← Entry point, run this
-├── agents.py             ← Agent definitions (Planner + Executor)
-└── tasks.py              ← Task definitions for each agent
+├── agents.py             ← Agent definitions (Planner + Executor + Analyzer)
+├── tasks.py              ← Task definitions for each agent
+└── tools.py              ← Custom tools (template reader, context readers, GSOC)
 ```
 
 ---
@@ -102,23 +103,50 @@ ollama run qwen2.5-coder:14b --keepalive 60m
 
 ## Usage
 
-### Basic Usage
-
+### FastAPI Backend Feature
 ```bash
-python main.py "add user authentication with JWT to the Express API"
+python main.py "add a UDP check endpoint to the network health checker"
+```
+
+### React Frontend Feature
+```bash
+python main.py "add a dashboard to display network check results"
 ```
 
 ### With explicit project path
-
 ```bash
 python main.py "add a shopping cart feature" --project /Users/you/my-app
 ```
 
-### Interactive mode
+### GSOC Security Scan Analysis
+```bash
+python main.py --gsoc
+# Reads CSV files from network-health-checker-ui/backend/gsoc_scan/
+# Writes report to gsoc_scan/gsoc_scan_analysis.md
+```
 
+### Interactive mode
 ```bash
 python main.py
 # then type your feature request when prompted
+```
+
+---
+
+## Template Auto-Detection
+
+The workflow automatically selects the right Copilot agent template based on your feature request keywords:
+
+| Keywords in request | Template loaded |
+|---|---|
+| `react`, `ui`, `dashboard`, `component`, `page`, `vite`, `tsx`, `tailwind`, `navbar`, `modal` | `react-app-generator` |
+| `fastapi`, `endpoint`, `service`, `schema`, `check`, `dns`, `tcp`, `http`, `egress`, `network` | `fastapi-app-generator` |
+| `--gsoc` flag | `gsoc-scan-analyzer` |
+
+You can override by being explicit in your request:
+```bash
+python main.py "create a React dashboard for the TCP check results"  # → React
+python main.py "add a new async TCP proxy check endpoint"            # → FastAPI
 ```
 
 ---
@@ -201,20 +229,51 @@ apiBase: http://100.x.x.x:11434    # via Tailscale
 
 ## Day-to-Day Workflow
 
+### FastAPI Backend Feature
 ```
-1. Describe your feature
-   python main.py "your feature description"
+1. python main.py "add a UDP check endpoint"
 
-2. Claude plans it (you see it thinking in real time)
+2. Claude reads conventions + fastapi-app-generator template + existing code
 
-3. Qwen implements the code directly into your project files
+3. Claude plans: schemas → service → route → tests
 
-4. Open changed files in VS Code
+4. Qwen implements directly into your project files
 
-5. Ask Copilot Chat to review:
-   "Review this for bugs and security issues"
+5. Open changed files in VS Code → Copilot reviews
 
-6. Accept/reject suggestions, run tests, commit
+6. Run: pytest -q && helm lint helm/
+
+7. Commit if passing
+```
+
+### React Frontend Feature
+```
+1. python main.py "add a results dashboard with charts"
+
+2. Claude reads conventions + react-app-generator template + existing UI
+
+3. Claude plans: TypeScript interfaces → components → hooks → services → tests
+
+4. Qwen implements React components directly into your project
+
+5. Open changed files in VS Code → Copilot reviews
+
+6. Run: npm test && npm run lint
+
+7. Commit if passing
+```
+
+### GSOC Security Scan
+```
+1. Drop CSV files into network-health-checker-ui/backend/gsoc_scan/
+
+2. python main.py --gsoc
+
+3. Claude reads gsoc-scan-analyzer template + CSV files
+
+4. Claude writes gsoc_scan_analysis.md with findings and mitigations
+
+5. Review report, start with HIGH severity items
 ```
 
 ---
@@ -228,7 +287,34 @@ apiBase: http://100.x.x.x:11434    # via Tailscale
 | **Qwen 14B (Continue/Ollama)** | Developer | Writing and editing code |
 | **Copilot (autocomplete)** | Junior Dev | Inline suggestions while typing |
 | **Copilot Chat** | Codebase Expert | Questions about existing code |
-| **CrewAI (this tool)** | Autonomous Worker | Full feature implementation |
+| **CrewAI — Feature mode** | Autonomous Worker | Full feature implementation (FastAPI or React) |
+| **CrewAI — GSOC mode** | Security Analyst | Vulnerability and compliance scan reports |
+
+---
+
+## Copilot Agents Used as Templates
+
+Your `.github/agents/` templates are automatically loaded as context before planning and execution:
+
+| Agent | Loaded when |
+|---|---|
+| `fastapi-app-generator` | Backend feature requests (default) |
+| `react-app-generator` | Frontend/UI feature requests |
+| `gsoc-scan-analyzer` | `--gsoc` flag is passed |
+
+This ensures generated code always follows your established project conventions — structure, naming, patterns, and quality standards — without needing to repeat them in every prompt.
+
+---
+
+## Custom Tools (tools.py)
+
+| Tool | Purpose |
+|---|---|
+| `CopilotAgentTemplate` | Reads `.github/agents/` templates into agent context |
+| `ProjectConventions` | Reads `copilot-instructions.md`, `AGENTS.md`, `README.md` |
+| `NetworkCheckerContext` | Reads existing FastAPI services, schemas, routes, config |
+| `ReactUIContext` | Reads existing React components, pages, hooks, config |
+| `GSocScanReader` | Reads GSOC vulnerability and compliance CSV files |
 
 ---
 
@@ -238,12 +324,16 @@ apiBase: http://100.x.x.x:11434    # via Tailscale
 |---|---|
 | Autocomplete while typing | Copilot |
 | Questions about existing code | Copilot Chat |
-| Plan a new feature | Continue → Claude Sonnet |
-| Write or edit code | Continue → Qwen 14B (`Cmd+I`) |
+| Plan a new FastAPI feature | Continue → Claude Sonnet |
+| Plan a new React feature | Continue → Claude Sonnet |
+| Write or edit backend code | Continue → Qwen 14B (`Cmd+I`) |
+| Write or edit frontend code | Continue → Qwen 14B (`Cmd+I`) |
 | Review code | Copilot Chat or Continue → Claude |
 | Write tests | Continue → `/test` → Qwen 14B |
-| Full feature end-to-end | `python main.py "feature"` |
-| Architecture decisions | claude.ai (this chat) |
+| Full FastAPI feature end-to-end | `python main.py "backend feature"` |
+| Full React feature end-to-end | `python main.py "ui/react feature"` |
+| GSOC security scan report | `python main.py --gsoc` |
+| Architecture decisions | claude.ai (consultant) |
 | Private/sensitive code | Continue → Qwen (stays local) |
 
 ---
@@ -352,6 +442,20 @@ ollama run qwen2.5-coder:14b --keepalive 60m
 
 ### llama-server binary not found
 Reinstall Ollama using the official Mac app from [ollama.com](https://ollama.com) instead of Homebrew.
+
+### GSOC scan folder not found
+Make sure your CSV files are in:
+```
+network-health-checker-ui/backend/gsoc_scan/
+```
+Files must end in `_VULNERABILITIES.csv` or `_COMPLIANCES.csv`.
+
+### React UI project not found
+If `ReactUIContext` reports the UI folder missing, it means the React project hasn't been scaffolded yet. Run:
+```bash
+python main.py "scaffold a new React TypeScript dashboard app with Vite"
+```
+The agent will use the `react-app-generator` template to create it from scratch.
 
 ---
 
