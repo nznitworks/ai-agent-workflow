@@ -27,8 +27,11 @@ ai-dev-team/
 ├── requirements.txt      ← Python dependencies
 ├── main.py               ← Entry point, run this
 ├── agents.py             ← Agent definitions (Planner + Executor + Analyzer)
-├── tasks.py              ← Task definitions for each agent
-└── tools.py              ← Custom tools (template reader, context readers, GSOC)
+├── tasks.py              ← Task definitions + chunk templates
+├── tools.py              ← Custom tools (template reader, context readers, GSOC)
+├── parse_output.py       ← Fallback file extractor from markdown output
+└── tests/
+    └── test_chunking.py  ← Tests for chunked execution logic
 ```
 
 ---
@@ -124,6 +127,42 @@ python main.py --gsoc
 # Reads CSV files from network-health-checker-ui/backend/gsoc_scan/
 # Writes report to gsoc_scan/gsoc_scan_analysis.md
 ```
+
+### Chunked Scaffold (full greenfield creation)
+```bash
+# Auto-detected — large scaffold requests are chunked automatically
+python main.py "create the full frontend for Network Health Checker"
+
+# Force chunking on any task
+python main.py --chunked "add all CRUD endpoints"
+
+# Disable chunking (single-pass, old behavior)
+python main.py --no-chunk "create the full frontend"
+```
+
+Chunked mode solves a Qwen 14B limitation: when asked to generate many files in one shot, it exhausts its output budget and starts producing stubs (`// TODO`, `continue similarly...`). Chunked mode splits the work into focused passes of 2-7 files each.
+
+**How it works:**
+```
+python main.py "create the full frontend scaffold"
+        │
+        ▼  Auto-detects "react-scaffold" chunk template
+        │
+  Phase 1: Claude plans EVERYTHING (1 API call)
+        │  Plan structured into 5 sections
+        │
+  Phase 2: Qwen executes each section independently
+        │
+    Chunk 1/5: Types & Services  (2 files)  ✅
+    Chunk 2/5: Hooks             (5 files)  ✅
+    Chunk 3/5: Components        (5 files)  ✅
+    Chunk 4/5: Pages             (6 files)  ✅
+    Chunk 5/5: Config & Entry    (7 files)  ✅
+        │
+  Summary + Copilot review reminder
+```
+
+Each chunk gets a focused prompt with only its plan section and a list of files already written (so imports resolve correctly).
 
 ### Interactive mode
 ```bash
@@ -246,7 +285,7 @@ apiBase: http://100.x.x.x:11434    # via Tailscale
 7. Commit if passing
 ```
 
-### React Frontend Feature
+### React Frontend Feature (single feature)
 ```
 1. python main.py "add a results dashboard with charts"
 
@@ -261,6 +300,29 @@ apiBase: http://100.x.x.x:11434    # via Tailscale
 6. Run: npm test && npm run lint
 
 7. Commit if passing
+```
+
+### Full Frontend Scaffold (chunked)
+```
+1. python main.py "create the full frontend for Network Health Checker"
+
+2. Auto-detects react-scaffold template → chunked mode activates
+
+3. Claude plans ALL sections in one pass (types, hooks, components, pages, config)
+
+4. Qwen executes chunk 1/5: Types & Services (2 files)
+   Qwen executes chunk 2/5: Hooks (5 files)
+   Qwen executes chunk 3/5: Components (5 files)
+   Qwen executes chunk 4/5: Pages (6 files)
+   Qwen executes chunk 5/5: Config & Entry (7 files)
+
+5. Full plan saved to ai-dev-team-plan.md for reference
+
+6. Open changed files in VS Code → Copilot reviews
+
+7. Run: npm install && npm run dev && npm test
+
+8. Commit if passing
 ```
 
 ### GSOC Security Scan
@@ -453,9 +515,16 @@ Files must end in `_VULNERABILITIES.csv` or `_COMPLIANCES.csv`.
 ### React UI project not found
 If `ReactUIContext` reports the UI folder missing, it means the React project hasn't been scaffolded yet. Run:
 ```bash
-python main.py "scaffold a new React TypeScript dashboard app with Vite"
+python main.py "create the full frontend for Network Health Checker"
 ```
-The agent will use the `react-app-generator` template to create it from scratch.
+This auto-detects the `react-scaffold` chunk template and generates the full frontend in 5 focused passes (types → hooks → components → pages → config).
+
+### Qwen produces stubs or "continue similarly..."
+This happens when the task is too large for a single pass. Use chunked mode:
+```bash
+python main.py --chunked "your large feature request"
+```
+If auto-detection didn't trigger, add scaffold keywords like "full frontend" or "complete backend" to your request. If a chunk still produces stubs, its raw output is saved to `ai-dev-team-chunk-{N}-output.md` — you can use `parse_output.py` to extract files manually.
 
 ---
 
